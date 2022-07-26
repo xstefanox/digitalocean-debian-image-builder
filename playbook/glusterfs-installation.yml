@@ -1,0 +1,31 @@
+---
+
+- name: "GlusterFS installation"
+  hosts: default
+
+  tasks:
+
+    - name: "package version"
+      include_vars:
+        file: versions.yml
+
+    - name: "GlusterFS package"
+      package:
+        name: glusterfs-server={{glusterfs}}
+        state: present
+
+    - name: "server up and running"
+      service:
+        name: glusterd
+        enabled: yes
+        state: started
+
+    - name: "brick mount point"
+      file:
+        path: /srv/glusterfs/swarm-storage/brick1
+        state: directory
+
+    - name: "GlusterFS volume mount point"
+      file:
+        path: /mnt/swarm-storage
+        state: directory

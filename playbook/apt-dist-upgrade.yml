@@ -1,0 +1,49 @@
+---
+
+- name: "APT dist upgrade"
+  hosts: default
+
+  tasks:
+
+    - name: "APT cache update timer removal"
+      systemd:
+        name: "apt-daily.timer"
+        enabled: no
+        daemon_reload: true
+
+    - name: "APT packages upgrade timer removal"
+      systemd:
+        name: "apt-daily-upgrade.timer"
+        enabled: no
+        daemon_reload: true
+
+    - name: "APT cache update service removal"
+      systemd:
+        name: "apt-daily.service"
+        enabled: no
+        state: stopped
+        daemon_reload: true
+
+    - name: "APT packages upgrade service removal"
+      systemd:
+        name: "apt-daily-upgrade.service"
+        enabled: no
+        state: stopped
+        daemon_reload: true
+
+    - name: "Wait for any possibly running unattended upgrade to finish"
+      raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
+
+    - name: "Wait for APT lock"
+      become: yes
+      shell: while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 5; done;
+
+    - name: "unattended-upgrades removal"
+      apt:
+        name: unattended-upgrades
+        state: absent
+
+    - name: "APT dist upgrade"
+      apt:
+        update_cache: true
+        upgrade: dist

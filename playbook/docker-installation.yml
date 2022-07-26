@@ -1,0 +1,64 @@
+---
+
+- name: "Docker Swarm installation"
+  hosts: default
+
+  tasks:
+
+    - name: "repository key"
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: "repository configuration"
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{debian}} stable"
+        state: present
+
+    - name: "service installation"
+      package:
+        name: docker-ce={{docker}}
+        state: present
+
+    - name: "service shutdown"
+      service:
+        name: docker
+        state: stopped
+        enabled: no
+
+    - name: "Docker configuration directory"
+      file:
+        path: /etc/docker
+        state: directory
+        owner: root
+        group: root
+
+    - name: "Docker configuration file"
+      template:
+        src: docker-daemon.json
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+
+    - name: "Docker systemd unit file creation"
+      copy:
+        remote_src: true
+        src: /lib/systemd/system/docker.service
+        dest: /etc/systemd/system/docker.service
+
+    - name: "Systemd Docker unit file fix"
+      replace:
+        path: /etc/systemd/system/docker.service
+        regexp: " -H fd://"
+        replace: ""
+
+    - name: "Python libraries"
+      package:
+        name: python3-pip
+        state: present
+
+    - name: "Docker Python library installation"
+      pip:
+        name:
+          - docker
+          - jsondiff

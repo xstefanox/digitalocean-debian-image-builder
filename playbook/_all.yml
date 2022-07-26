@@ -1,0 +1,8 @@
+---
+
+- import_playbook: apt-dist-upgrade.yml
+- import_playbook: glusterfs-installation.yml
+  when: install_glusterfs == "true"
+- import_playbook: docker-installation.yml
+  when: install_docker == "true"
+- import_playbook: apt-cache-cleaning.yml

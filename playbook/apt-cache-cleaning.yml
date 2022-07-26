@@ -1,0 +1,9 @@
+---
+
+- name: "APT cache cleaning"
+  hosts: default
+
+  tasks:
+
+    - name: "APT cache cleaning"
+      command: apt clean
