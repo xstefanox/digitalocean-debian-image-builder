@@ -1,4 +1,11 @@
 ---
+- name: "Initialization"
+  hosts: default
+  tasks:
+
+    - name: "package version"
+      include_vars:
+        file: versions.yml
 
 - import_playbook: apt-dist-upgrade.yml
 - import_playbook: glusterfs-installation.yml

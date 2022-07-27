@@ -5,10 +5,6 @@
 
   tasks:
 
-    - name: "package version"
-      include_vars:
-        file: versions.yml
-
     - name: "GlusterFS package"
       package:
         name: glusterfs-server={{glusterfs}}
