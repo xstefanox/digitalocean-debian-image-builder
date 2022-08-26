@@ -8,6 +8,9 @@ function extract_version() {
   sed -n "/$pkg:/ s/.*: // p" $DEBIAN_VERSION_FILE
 }
 
+# https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/${DEBIAN_RELEASE}/amd64/apt
+# https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/${DEBIAN_RELEASE}/amd64/apt/dists/${DEBIAN_RELEASE}/main/binary-amd64/Packages
+
 function check_debian_image() {
   local DEBIAN_RELEASE
   local current
@@ -28,8 +31,13 @@ EOT
   echo "$(clr_blue "Digital Ocean image / Debian / Docker CE:")   current = $($clr "$current")   latest = $latest"
 
   current=$(sed -n '/glusterfs/ s/.*: // p' $DEBIAN_VERSION_FILE)
-  latest=$(http GET "http://deb.debian.org/debian/dists/${DEBIAN_RELEASE}/main/binary-amd64/Packages.gz" | gunzip | sed -n '/Package: glusterfs-server$/,/Version:/ s/Version: // p')
-  clr=$([[ $current < $latest ]] && echo clr_brown || echo clr_green)
+  latest=$(http GET "https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/${DEBIAN_RELEASE}/amd64/apt/dists/${DEBIAN_RELEASE}/main/binary-amd64/Packages.gz" | gunzip | sed -n '/Package: glusterfs-server$/,/Version:/ s/Version: // p')
+  newest=$(cat << EOT | sort --version-sort --reverse | head -1
+$current
+$latest
+EOT
+)
+  clr=$([[ $current != "$newest" ]] && echo clr_brown || echo clr_green)
 
   echo "$(clr_blue "Digital Ocean image / Debian / GlusterFS server:")   current = $($clr "$current")   latest = $latest"
 }

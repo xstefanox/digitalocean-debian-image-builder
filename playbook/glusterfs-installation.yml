@@ -5,6 +5,16 @@
 
   tasks:
 
+    - name: "repository key installation"
+      apt_key:
+        url: https://download.gluster.org/pub/gluster/glusterfs/10/rsa.pub
+        state: present
+
+    - name: "repository configuration"
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.gluster.org/pub/gluster/glusterfs/LATEST/Debian/{{debian}}/amd64/apt {{debian}} main"
+        state: present
+
     - name: "GlusterFS package"
       package:
         name: glusterfs-server={{glusterfs}}
@@ -15,13 +25,3 @@
         name: glusterd
         enabled: yes
         state: started
-
-    - name: "brick mount point"
-      file:
-        path: /srv/glusterfs/swarm-storage/brick1
-        state: directory
-
-    - name: "GlusterFS volume mount point"
-      file:
-        path: /mnt/swarm-storage
-        state: directory
