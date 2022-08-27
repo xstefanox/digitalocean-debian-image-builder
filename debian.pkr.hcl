@@ -13,7 +13,7 @@ variable digitalocean_token {
 
 locals {
   region = "fra1"
-  size   = "s-1vcpu-1gb"
+  size   = "s-1vcpu-512mb-10gb"
   image  = "debian-11-x64"
   snapshot_regions = [
     "nyc1",
